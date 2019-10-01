@@ -97,3 +97,23 @@ func (h *Handler) Adduser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, customer)
 }
+
+func (h *Handler) SignOut(c *gin.Context) {
+	if h.db == nil {
+		return
+	}
+	p := c.Param("id")
+	// p is of type string, we need to convert it to an integer type
+	id, err := strconv.Atoi(p)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = h.db.SignOutUserById(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+}
+
