@@ -80,7 +80,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 	c.JSON(http.StatusOK, customer)
 }
 
-func (h *Handler) Adduser(c *gin.Context) {
+func (h *Handler) AddUser(c *gin.Context) {
 	if h.db == nil {
 		return
 	}
