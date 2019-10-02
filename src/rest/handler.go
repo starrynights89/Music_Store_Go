@@ -33,8 +33,14 @@ func NewHandler() (*Handler, error) {
 	return new(Handler), nil
 }
 
+func (h *Handler) GetMainPage(c *gin.Context) {
+	log.Println("Main page...")
+	c.String(http.StatusOK, "Main page for secure API!!")
+}
+
 func (h *Handler) GetProducts(c *gin.Context) {
 	if h.db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server database error"})
 		return 
 	}
 	products, err := h.db.GetAllProducts()
@@ -46,11 +52,13 @@ func (h *Handler) GetProducts(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	fmt.Printf("Found %d products\n", len(products))
 	c.JSON(http.StatusOK, products)
 }
 
 func (h *Handler) GetPromos(c *gin.Context) {
 	if h.db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server database error"})
 		return
 	}
 	promos, err := h.db.GetPromos()
@@ -61,27 +69,9 @@ func (h *Handler) GetPromos(c *gin.Context) {
 	c.JSON(http.StatusOK, promos)
 }
 
-func (h *Handler) SignIn(c *gin.Context) {
-	if h.db == nil {
-		return		
-	}
-	// Extract JSON documents from HTTP request body, then parse it to *models.Customer
-	var customer models.Customer
-	err := c.ShouldBindJSON(&customer)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	customer, err = h.db.SignInUser(customer)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return 
-	}
-	c.JSON(http.StatusOK, customer)
-}
-
 func (h *Handler) AddUser(c *gin.Context) {
 	if h.db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server database error"})
 		return
 	}
 	var customer models.Customer
@@ -93,6 +83,21 @@ func (h *Handler) AddUser(c *gin.Context) {
 	customer, err = h.db.AddUser(customer)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, customer)
+}
+
+func (h *Handler) SignIn(c *gin.Context) {
+	if h.db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server database error"})
+		return		
+	}
+	// Extract JSON documents from HTTP request body, then parse it to *models.Customer
+	var customer models.Customer
+	err := c.ShouldBindJSON(&customer)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, customer)

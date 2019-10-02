@@ -14,8 +14,6 @@ func RunAPIWithHandler(address string) error {
 	// get promos
 	r.GET("/promos", h.GetPromos)
 	/*
-		// post user sign in
-		r.POST("/users/signin", h.SignIn)
 	// post user sign out
 		In the path below, our relative url needs to include the user id
 		Since the id will differ based on the user, the Gin framework allows us to include a wildecard. 
